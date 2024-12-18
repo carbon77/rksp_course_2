@@ -1,0 +1,13 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/rsocket-app
+      database: books
+
+  application:
+    name: rsocket-app
+
+  rsocket:
+    server:
+      port: 7000
+

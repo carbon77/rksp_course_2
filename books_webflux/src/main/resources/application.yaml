@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: books-webflux
+
+  r2dbc:
+    url: r2dbc:postgres://localhost:5432/postgres
+    username: zakat
+    password: zakat
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: sandbox
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    database: postgresql
+
+logging:
+  level:
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+  endpoint:
+    health:
+      show:
+        details: always
+
+app:
+  s3:
+    aws-access-key-id: ${AWS_ACCESS_KEY_ID}
+    aws-secret-access-key: ${AWS_SECRET_ACCESS_KEY}
+    endpoint: storage.yandexcloud.net
+    region: ru-central1

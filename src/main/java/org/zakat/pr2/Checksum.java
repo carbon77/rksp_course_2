@@ -13,9 +13,7 @@ public class Checksum {
     public static void main(String[] args) throws IOException {
         String filePath = "file.txt";
         short checkSum = findFileChecksum(filePath);
-        String text = String.join("\n", Files.readAllLines(Paths.get(filePath)));
         System.out.printf("16-bit checksum of %s: %d\n", filePath, checkSum);
-        System.out.printf("16-bit checksum of text %s: %d", filePath, findChecksum(text));
     }
 
     public static int findChecksum(String text) {

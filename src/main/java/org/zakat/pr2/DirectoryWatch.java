@@ -3,8 +3,7 @@ package org.zakat.pr2;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DirectoryWatch {
     private final Map<Path, List<String>> fileContents;
@@ -57,7 +56,30 @@ public class DirectoryWatch {
     }
 
     private void onEntryModify(WatchEvent<?> event, Path fullPath) {
+        try {
+            HashSet<String> newLines = new HashSet<>(Files.readAllLines(fullPath));
+            HashSet<String> oldLines = new HashSet<>(fileContents.getOrDefault(fullPath, new ArrayList<>()));
 
+            List<String> addedLines = new ArrayList<>(newLines);
+            addedLines.removeAll(oldLines);
+
+            List<String> deletedLines = new ArrayList<>(oldLines);
+            deletedLines.removeAll(newLines);
+
+            System.out.println("==MODIFY==");
+            System.out.println("\nAdded lines:");
+            for (var line : addedLines) {
+                System.out.println(line);
+            }
+
+            System.out.println("\nDeleted lines:");
+            for (var line : deletedLines) {
+                System.out.println(line);
+            }
+            fileContents.put(fullPath, new ArrayList<>(newLines));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void onEntryCreate(WatchEvent<?> event, Path fullPath) {
@@ -70,33 +92,8 @@ public class DirectoryWatch {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        WatchService watchService = FileSystems.getDefault().newWatchService();
-        Path dirPath = Paths.get("watchDir");
-
-        dirPath.register(watchService,
-                StandardWatchEventKinds.ENTRY_CREATE,
-                StandardWatchEventKinds.ENTRY_MODIFY,
-                StandardWatchEventKinds.ENTRY_DELETE);
-
-        System.out.printf("Monitoring directory: %s\n", dirPath);
-
-        WatchKey key;
-        while ((key = watchService.take()) != null) {
-            for (WatchEvent<?> event : key.pollEvents()) {
-                WatchEvent.Kind<?> kind = event.kind();
-                Path fileName = (Path) event.context();
-                Path fullPath = dirPath.resolve(fileName);
-
-                if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-                    System.out.printf("File created: %s\n", fullPath);
-                } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-                    File f = fullPath.toFile();
-                    System.out.printf("File deleted: %s\n", fullPath);
-                    System.out.printf("Size: %d\n", f.exists() ? f.length() : 0);
-                    System.out.printf("Checksum: %s\n", Checksum.findChecksum(fullPath.toString()));
-                }
-            }
-            key.reset();
-        }
+        String dirPath = "./watchDir";
+        DirectoryWatch watch = new DirectoryWatch(new HashMap<>());
+        watch.watchDir(dirPath);
     }
 }

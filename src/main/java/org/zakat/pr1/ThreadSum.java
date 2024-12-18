@@ -12,6 +12,10 @@ public class ThreadSum implements Runnable {
         this.end = end;
     }
 
+    public long getSum() {
+        return sum;
+    }
+
     @Override
     public void run() {
         for (int i = start; i < end; i++) {
@@ -24,16 +28,11 @@ public class ThreadSum implements Runnable {
         }
     }
 
-    public long getSum() {
-        return sum;
-    }
-
     public static long sum(int[] array, int threadCount) throws InterruptedException {
         long sum = 0;
         int chunkSize = array.length / threadCount;
         Thread[] threads = new Thread[threadCount];
         ThreadSum[] tasks = new ThreadSum[threadCount];
-
         for (int i = 0; i < threadCount; i++) {
             int start = i * chunkSize;
             int end = Math.min(start + chunkSize, array.length);
@@ -41,12 +40,10 @@ public class ThreadSum implements Runnable {
             threads[i] = new Thread(tasks[i]);
             threads[i].start();
         }
-
         for (int i = 0; i < threadCount; i++) {
             threads[i].join();
             sum += tasks[i].getSum();
         }
-
         return sum;
     }
 }
